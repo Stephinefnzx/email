@@ -33,6 +33,9 @@ const headers = {
 app.post('/check-mail', async (req, res) => {
     const { email } = req.body;
 
+    console.log(email);
+    console.log(req.body);
+
     if (!email) {
         return res.status(400).json({ error: "Missing email in request body." });
     }
