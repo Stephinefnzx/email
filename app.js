@@ -1,16 +1,16 @@
 const express = require('express');
 const axios = require('axios');
-
 const app = express();
 const PORT = 3000;
 
-// Middleware to parse JSON bodies
+// Accept JSON
 app.use(express.json());
+// Accept form data (e.g., from HTML forms or Postman "x-www-form-urlencoded")
+app.use(express.urlencoded({ extended: true }));
 
-// Microsoft email validation endpoint
+// Microsoft email check setup
 const url = 'https://login.microsoftonline.com/common/GetCredentialType?mkt=en-US';
 
-// Template payload used for the validation request
 const payloadTemplate = {
     isOtherIdpSupported: true,
     checkPhones: false,
@@ -27,7 +27,6 @@ const payloadTemplate = {
     isAccessPassSupported: true,
 };
 
-// Headers used in the request
 const headers = {
     "Accept-Language": "en-US,en;q=0.9",
     "Connection": "close",
@@ -35,12 +34,12 @@ const headers = {
     "User-Agent": "Mozilla/5.0"
 };
 
-// POST endpoint to check email validity
+// Route to check email validity
 app.post('/check-mail', async (req, res) => {
     const { email } = req.body;
 
     console.log("Received email:", email);
-    console.log("Raw body:", req.body);
+    console.log("Full body:", req.body);
 
     if (!email) {
         return res.status(400).json({ error: "Missing email in request body." });
@@ -48,9 +47,7 @@ app.post('/check-mail', async (req, res) => {
 
     try {
         const payload = { ...payloadTemplate, username: email };
-
         const response = await axios.post(url, payload, { headers });
-
         const result = response.data?.IfExistsResult;
 
         if (result === 5 || result === 0) {
@@ -58,14 +55,12 @@ app.post('/check-mail', async (req, res) => {
         } else {
             return res.json({ status: "invalid", code: result });
         }
-
     } catch (error) {
-        console.error("Error validating email:", error.message);
+        console.error("Validation error:", error.message);
         return res.status(500).json({ error: "Failed to validate email." });
     }
 });
 
-// Start the server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
