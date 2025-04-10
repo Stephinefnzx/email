@@ -33,8 +33,8 @@ const headers = {
 app.post('/check-mail', async (req, res) => {
     const { email } = req.body;
 
-    console.log(email);
-    console.log(req.body);
+    console.log("Email:", email);
+    console.log("Body:", req.body);
 
     if (!email) {
         return res.status(400).json({ error: "Missing email in request body." });
@@ -57,6 +57,10 @@ app.post('/check-mail', async (req, res) => {
         console.error("Error validating email:", error.message);
         return res.status(500).json({ error: "Failed to validate email." });
     }
+});
+
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
 });
 
 app.listen(PORT, () => {
